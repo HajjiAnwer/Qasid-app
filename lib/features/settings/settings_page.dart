@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../app_state.dart';
+import '../../l10n/app_localizations.dart';
 
 class SettingsPage extends StatelessWidget {
   final String mosque; // mecca | madinah
@@ -17,12 +18,11 @@ class SettingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isAr =
-    Localizations.localeOf(context).languageCode.startsWith('ar');
+    final l10n = context.l10n;
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(isAr ? 'الإعدادات' : 'Settings'),
+          title: Text(l10n.settings),
           centerTitle: true,
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,
@@ -33,22 +33,22 @@ class SettingsPage extends StatelessWidget {
         children: [
           /// ================= Language =================
           _SettingCard(
-            title: isAr ? 'اللغة' : 'Language',
+            title: l10n.language,
             icon: Icons.language,
             child: Column(
               children: [
                 RadioListTile<bool>(
-                  title: const Text('العربية'),
+                  title: Text(l10n.arabic),
                   value: true,
-                  groupValue: isAr,
+                  groupValue: Localizations.localeOf(context).languageCode.startsWith('ar'),
                     onChanged: (v) =>
                         context.read<AppState>().setLocale(const Locale('ar')),
 
                 ),
                 RadioListTile<bool>(
-                  title: const Text('English'),
+                  title: Text(l10n.english),
                   value: false,
-                  groupValue: isAr,
+                  groupValue: Localizations.localeOf(context).languageCode.startsWith('ar'),
                     onChanged: (v) =>
                         context.read<AppState>().setLocale(const Locale('en')),
 
@@ -61,7 +61,7 @@ class SettingsPage extends StatelessWidget {
 
           /// ================= Choose Masjid =================
           _SettingCard(
-            title: isAr ? 'اختيار المسجد' : 'Select Mosque',
+            title: l10n.selectMosque,
             icon: Icons.mosque,
             iconColor: primaryColor,
             child: Row(
@@ -70,9 +70,7 @@ class SettingsPage extends StatelessWidget {
                 /// المسجد الحرام
                 Expanded(
                   child: _MosqueButton(
-                    title: isAr
-                        ? 'المسجد الحرام'
-                        : 'Al-Masjid Al-Haram',
+                    title: l10n.alHaram,
                     selected: mosque == 'mecca',
                     color: const Color(0xFFD4AF37),
                     onTap: () => onMosqueChanged('mecca'),
@@ -84,9 +82,7 @@ class SettingsPage extends StatelessWidget {
                 /// المسجد النبوي
                 Expanded(
                   child: _MosqueButton(
-                    title: isAr
-                        ? 'المسجد النبوي'
-                        : 'Al-Masjid An-Nabawi',
+                    title: l10n.anNabawi,
                     selected: mosque == 'madinah',
                     color: const Color(0xFF0C6B43),
                     onTap: () => onMosqueChanged('madinah'),
@@ -133,19 +129,19 @@ class SettingsPage extends StatelessWidget {
 
           /// ================= About =================
           _SettingCard(
-            title: isAr ? 'عن التطبيق' : 'About',
+            title: l10n.about,
             icon: Icons.info_outline,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'بوابة القاصد',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  l10n.appName,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  isAr ? 'الإصدار 1.0.0' : 'Version 1.0.0',
-                  style: TextStyle(color: Colors.grey),
+                  l10n.version,
+                  style: const TextStyle(color: Colors.grey),
                 ),
               ],
             ),

@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class TopNavBar extends StatelessWidget {
-  final bool isAr;
   final Color primaryColor;
 
   const TopNavBar({
     super.key,
-    required this.isAr,
     required this.primaryColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -29,9 +29,7 @@ class TopNavBar extends StatelessWidget {
           children: [
             const Icon(Icons.notifications, color: Colors.white, size: 28),
             Text(
-              isAr
-                  ? 'الخدمات الإلكترونية\nللحرمين الشريفين'
-                  : 'Electronic Services\nfor the Two Holy Mosques',
+              l10n.electronicServices,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,

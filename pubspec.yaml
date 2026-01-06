@@ -69,12 +69,14 @@ flutter_launcher_icons:
 # The following section is specific to Flutter packages.
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - assets/guide/
     - assets/data/
     - assets/images/
     - assets/audio/
     - assets/icons/
+    - assets/i18n/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_localizations.dart';
 
 class PrayerTimerDisplay extends StatelessWidget {
-  final bool isAr;
   final String prayerName;
   final String timerText;
   final Color primaryColor;
@@ -11,7 +11,6 @@ class PrayerTimerDisplay extends StatelessWidget {
 
   const PrayerTimerDisplay({
     super.key,
-    required this.isAr,
     required this.prayerName,
     required this.timerText,
     required this.primaryColor,
@@ -22,6 +21,7 @@ class PrayerTimerDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     final Color activeColor = strokeColor ?? primaryColor;
     
     return SizedBox(
@@ -56,7 +56,7 @@ class PrayerTimerDisplay extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                isAr ? 'الأذان التالي' : 'Next Prayer',
+                l10n.nextPrayer,
                 style: const TextStyle(
                   color: Colors.black,
                   fontSize: 16,

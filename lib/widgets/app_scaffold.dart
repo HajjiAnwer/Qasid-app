@@ -7,6 +7,7 @@ import '../features/home/home_page.dart';
 import '../features/settings/settings_page.dart';
 import '../features/web_page/fatiha_web_page.dart';
 import '../features/web_page/web_page.dart';
+import '../l10n/app_localizations.dart';
 import '../routes.dart';
 
 class AppScaffold extends StatefulWidget {
@@ -28,8 +29,7 @@ class _AppScaffoldState extends State<AppScaffold> {
 
   @override
   Widget build(BuildContext context) {
-    final isAr =
-    Localizations.localeOf(context).languageCode.startsWith('ar');
+    final l10n = context.l10n;
 
     final pages = [
       /// الرئيسية
@@ -43,27 +43,21 @@ class _AppScaffoldState extends State<AppScaffold> {
       ),
 
       /// الفاتحة
-      // WebPage(
-      //   title: isAr ? 'الفاتحة' : 'Al-Fatiha',
-      //   url: 'https://fatiha.prh.gov.sa/home',
-      //   primaryColor: primaryColor,
-      // ),
-
       FatihaWebPage(
         primaryColor: primaryColor,
       ),
 
       /// مقرأة الحرمين
       WebPage(
-        title: isAr ? 'مقرأة الحرمين' : 'Haram Recitations',
-        url: 'https://maqraa.prh.gov.sa/${isAr ? 'ar' : 'en'}',
+        title: l10n.maqdaahAlHarameen,
+        url: 'https://maqraa.prh.gov.sa/${Localizations.localeOf(context).languageCode}',
         primaryColor: primaryColor,
       ),
 
       /// رسالة الحرمين
       WebPage(
-        title: isAr ? 'رسالة الحرمين' : 'Haram Message',
-        url: 'https://risala.prh.gov.sa/${isAr ? 'ar' : 'en'}',
+        title: l10n.risalaAlHarameen,
+        url: 'https://risala.prh.gov.sa/${Localizations.localeOf(context).languageCode}',
         primaryColor: primaryColor,
       ),
 
@@ -97,8 +91,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                 index: 0,
                 icon: Icons.home_outlined,
                 selectedIcon: Icons.home,
-                label: isAr ? 'الرئيسية' : 'Home',
-                isAr: isAr,
+                label: l10n.home,
                 onTap: () async {
                   setState(() => _selectedIndex = 0);
                 },
@@ -107,8 +100,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                 index: 1,
                 icon: Icons.menu_book_outlined,
                 selectedIcon: Icons.menu_book,
-                label: isAr ? 'الفاتحة' : 'Alfatiha',
-                isAr: isAr,
+                label: l10n.alfatiha,
                 onTap: () async {
                   if (Platform.isIOS) {
                     final uri = Uri.parse('https://fatiha.prh.gov.sa/home');
@@ -125,8 +117,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                 index: 2,
                 icon: Icons.library_music_outlined,
                 selectedIcon: Icons.library_music,
-                label: isAr ? 'مقرأة الحرمين' : 'Recitations',
-                isAr: isAr,
+                label: l10n.recitations,
                 onTap: () async {
                   setState(() => _selectedIndex = 2);
                 },
@@ -135,8 +126,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                 index: 3,
                 icon: Icons.mail_outline,
                 selectedIcon: Icons.mail,
-                label: isAr ? 'رسالة الحرمين' : 'Message',
-                isAr: isAr,
+                label: l10n.message,
                 onTap: () async {
                   setState(() => _selectedIndex = 3);
                 },
@@ -145,8 +135,7 @@ class _AppScaffoldState extends State<AppScaffold> {
                 index: 4,
                 icon: Icons.settings_outlined,
                 selectedIcon: Icons.settings,
-                label: isAr ? 'الإعدادات' : 'Settings',
-                isAr: isAr,
+                label: l10n.settings,
                 onTap: () async {
                   setState(() => _selectedIndex = 4);
                 },
@@ -163,7 +152,6 @@ class _AppScaffoldState extends State<AppScaffold> {
     required IconData icon,
     required IconData selectedIcon,
     required String label,
-    required bool isAr,
     required VoidCallback onTap,
   }) {
     final isSelected = _selectedIndex == index;

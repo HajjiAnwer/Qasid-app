@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'app_state.dart';
+import 'l10n/app_localizations.dart';
 import 'widgets/app_scaffold.dart';
 
 void main() async {
@@ -28,6 +29,7 @@ class QasidApp extends StatelessWidget {
       locale: appState.locale,
       supportedLocales: const [Locale('ar'), Locale('en')],
       localizationsDelegates: const [
+        AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
@@ -45,12 +47,13 @@ class QasidApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       builder: (context, child) {
-        final scale = context.watch<AppState>().textScale;
+        final appState = context.watch<AppState>();
+        final scale = appState.textScale;
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
           child: Directionality(
             textDirection: appState.locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
-            child: child!,
+            child: child ?? const SizedBox(),
           ),
         );
       },

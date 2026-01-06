@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hijri/hijri_calendar.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../models/prayer_time.dart';
 import '../../services/prayer_api.dart';
 import '../Tools/top-nav-bar.dart';
@@ -154,10 +155,29 @@ class _HomePageState extends State<HomePage> {
     return progress.clamp(0.0, 1.0);
   }
 
+  String _getPrayerName(String prayerKey) {
+    final l10n = context.l10n;
+    switch (prayerKey.toLowerCase()) {
+      case 'fajr':
+        return l10n.fajr;
+      case 'prefajr':
+        return l10n.preFajr;
+      case 'dhuhr':
+        return l10n.dhuhr;
+      case 'asr':
+        return l10n.asr;
+      case 'maghrib':
+        return l10n.maghrib;
+      case 'isha':
+        return l10n.isha;
+      default:
+        return prayerKey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isAr =
-    Localizations.localeOf(context).languageCode.startsWith('ar');
+    final l10n = context.l10n;
 
     final active = _getActivePrayer();
     final bool isTomorrowPrayer = active != null &&
@@ -170,15 +190,15 @@ class _HomePageState extends State<HomePage> {
         ? start.difference(_now)
         : _now.difference(start);
 
-    final imamName = active?.imam?.displayName(isAr);
-    final muezzinName = active?.muezzin?.displayName(isAr);
+    final imamName = active?.imam?.displayName(Localizations.localeOf(context).languageCode.startsWith('ar'));
+    final muezzinName = active?.muezzin?.displayName(Localizations.localeOf(context).languageCode.startsWith('ar'));
     final progress = _getProgress(active);
 
     return Scaffold(
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          TopNavBar(isAr: isAr, primaryColor: widget.primaryColor),
+          TopNavBar(primaryColor: widget.primaryColor),
           Expanded(
             child: SafeArea(
               top: false,
@@ -188,7 +208,7 @@ class _HomePageState extends State<HomePage> {
                   width: double.infinity,
                   child: Column(
                     children: [
-                      _buildMosqueSelector(isAr),
+                      _buildMosqueSelector(),
                       const SizedBox(height: 24),
 
                       if (_loading)
@@ -198,8 +218,7 @@ class _HomePageState extends State<HomePage> {
                         )
                       else if (active != null)
                         _buildPrayerSection(
-                          isAr: isAr,
-                          prayerName: active.prayerName(isAr),
+                          prayerName: _getPrayerName(active.prayer),
                           timerText: _format(diff),
                           imam: imamName,
                           muezzin: muezzinName,
@@ -209,10 +228,10 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(height: 32),
 
                       HomeServicesSection(
-                        isAr: isAr,
                         mosque: widget.mosque,
                         primaryColor: widget.primaryColor,
                       ),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -227,7 +246,8 @@ class _HomePageState extends State<HomePage> {
   // ===============================
   // Mosque Selector
   // ===============================
-  Widget _buildMosqueSelector(bool isAr) {
+  Widget _buildMosqueSelector() {
+    final l10n = context.l10n;
     final bool isMecca = widget.mosque == 'mecca';
 
     return Padding(
@@ -244,14 +264,14 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: _buildSegment(
                 selected: isMecca,
-                text: isAr ? 'المسجد الحرام' : 'Al-Haram',
+                text: l10n.alHaram,
                 onTap: () => widget.onMosqueChanged('mecca'),
               ),
             ),
             Expanded(
               child: _buildSegment(
                 selected: !isMecca,
-                text: isAr ? 'المسجد النبوي' : 'An-Nabawi',
+                text: l10n.anNabawi,
                 onTap: () => widget.onMosqueChanged('madinah'),
               ),
             ),
@@ -293,17 +313,16 @@ class _HomePageState extends State<HomePage> {
   // Prayer Section (Separated Timer & Details)
   // ===============================
   Widget _buildPrayerSection({
-    required bool isAr,
     required String prayerName,
     required String timerText,
     String? imam,
     String? muezzin,
     required double progress,
   }) {
+    final l10n = context.l10n;
     return Column(
       children: [
         PrayerTimerDisplay(
-          isAr: isAr,
           prayerName: prayerName,
           timerText: timerText,
           primaryColor: widget.primaryColor,
@@ -326,7 +345,7 @@ class _HomePageState extends State<HomePage> {
                 if (imam != null && imam.isNotEmpty)
                   _buildDetailRow(
                     icon: Icons.person,
-                    label: isAr ? 'الإمام' : 'Imam',
+                    label: l10n.imam,
                     value: imam,
                   ),
                 if (imam != null && imam.isNotEmpty && muezzin != null && muezzin.isNotEmpty)
@@ -334,7 +353,7 @@ class _HomePageState extends State<HomePage> {
                 if (muezzin != null && muezzin.isNotEmpty)
                   _buildDetailRow(
                     icon: Icons.mic,
-                    label: isAr ? 'المؤذن' : 'Muezzin',
+                    label: l10n.muezzin,
                     value: muezzin,
                   ),
               ],
