@@ -4,9 +4,12 @@ import 'package:provider/provider.dart';
 import 'app_state.dart';
 import 'l10n/app_localizations.dart';
 import 'widgets/app_scaffold.dart';
+import 'features/Loading/loading_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox('apiCache');
   final appState = AppState();
   await appState.load();
   runApp(
@@ -57,7 +60,7 @@ class QasidApp extends StatelessWidget {
           ),
         );
       },
-      home: const AppScaffold(),
+      home: LoadingScreen(),
     );
   }
 }
