@@ -1,7 +1,53 @@
 import 'package:flutter/material.dart';
+import '../controllers/prayer_preload_controller.dart';
+import 'home_page.dart'; // Make sure to import your HomePage
 
-class LoadingScreen extends StatelessWidget {
+class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
+
+  @override
+  State<LoadingScreen> createState() => _LoadingScreenState();
+}
+
+class _LoadingScreenState extends State<LoadingScreen> {
+  @override
+  void initState() {
+    super.initState();
+    _preload();
+  }
+
+  Future<void> _preload() async {
+    try {
+      // Preload and update Hive cache for all mosques
+      await PrayerPreloadController.preload(
+        mosques: const [
+          'Makkah',
+          'Madinah',
+        ],
+      );
+      print('Preload finished, Hive cache updated.');
+    } catch (e) {
+      print('Preload failed: $e');
+      // App continues even if preload fails
+    }
+
+    if (!mounted) return;
+
+    // Navigate to HomePage
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => HomePage(
+          mosque: 'mecca', // default mosque
+          primaryColor: const Color(0xFF0C6B43),
+          onMosqueChanged: (mosque) {
+            // Handle mosque change if needed
+            print('Mosque changed to $mosque');
+          },
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +80,7 @@ class LoadingScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                   child: Column(
                     children: [
-                      // Custom linear progress
+                      // Indeterminate progress (during preload)
                       Container(
                         height: 16,
                         decoration: BoxDecoration(
@@ -43,10 +89,9 @@ class LoadingScreen extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                          child: LinearProgressIndicator(
-                            value: 0.6, // change or remove for indeterminate
+                          child: const LinearProgressIndicator(
                             backgroundColor: Color(0xFF0C6B43),
-                            valueColor: const AlwaysStoppedAnimation<Color>(
+                            valueColor: AlwaysStoppedAnimation<Color>(
                               Colors.white,
                             ),
                           ),
@@ -55,7 +100,6 @@ class LoadingScreen extends StatelessWidget {
 
                       const SizedBox(height: 10),
 
-                      // Loading text
                       const Text(
                         'Loading',
                         style: TextStyle(

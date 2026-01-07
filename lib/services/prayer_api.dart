@@ -1,25 +1,25 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:hive/hive.dart';
 import 'package:hijri/hijri_calendar.dart';
 import '../models/prayer_time.dart';
 
 class PrayerApi {
   final http.Client client;
 
-  // Caching
-  final Map<String, List<PrayerTime>> _cache = {};
-  final Map<String, DateTime> _cacheTimestamps = {};
-  static const Duration _cacheTtl = Duration(minutes: 5);
+  final Box _cacheBox = Hive.box('prayer_cache');
+  final Box _metaBox = Hive.box('prayer_cache_meta');
+
+  static const Duration _cacheTtl = Duration(hours: 24);
 
   PrayerApi({http.Client? client}) : client = client ?? http.Client();
 
+  // 🔑 Cache key per mosque + Gregorian day
   String _cacheKey({
     required String mosque,
-    required int hijriYear,
-    required int hijriMonth,
-    required int hijriDay,
+    required DateTime date,
   }) =>
-      '$mosque-$hijriYear-$hijriMonth-$hijriDay';
+      '$mosque-${date.year}-${date.month}-${date.day}';
 
   Uri _buildUri({
     required String mosque,
@@ -27,10 +27,10 @@ class PrayerApi {
     required int hijriMonth,
     required int hijriDay,
     int skip = 0,
-    int take = 10,
+    int take = 20,
   }) {
-    final base = 'https://haramainflagsapi.prh.gov.sa/prayers';
-    final params = {
+    return Uri.parse('https://haramainflagsapi.prh.gov.sa/prayers')
+        .replace(queryParameters: {
       'hijriYear': '$hijriYear',
       'hijriMonth': '$hijriMonth',
       'hijriDay': '$hijriDay',
@@ -39,12 +39,10 @@ class PrayerApi {
       'orderValue': 'asc',
       'skip': '$skip',
       'take': '$take',
-    };
-    final uri = Uri.parse(base).replace(queryParameters: params);
-    return uri;
+    });
   }
 
-  // Retry
+  // 🔁 Retry (unchanged)
   Future<T> _withRetry<T>(
       Future<T> Function() task, {
         int maxAttempts = 2,
@@ -55,47 +53,66 @@ class PrayerApi {
       attempt++;
       try {
         return await task();
-      } catch (e) {
+      } catch (_) {
         if (attempt >= maxAttempts) rethrow;
         await Future.delayed(delay);
       }
     }
   }
 
+  // 🧹 Auto cleanup old days
+  void _cleanupOldCache() {
+    final now = DateTime.now();
 
+    for (final key in _metaBox.keys) {
+      final cachedAt = DateTime.fromMillisecondsSinceEpoch(
+        _metaBox.get(key),
+      );
+
+      if (now.difference(cachedAt) > _cacheTtl) {
+        _cacheBox.delete(key);
+        _metaBox.delete(key);
+      }
+    }
+  }
+
+  // ===============================
+  // 🔥 FETCH PRAYERS (HIVE CACHE)
+  // ===============================
   Future<List<PrayerTime>> fetchPrayers({
     required String mosque,
-    required int hijriYear,
-    required int hijriMonth,
-    required int hijriDay,
-    int take = 20,
+    required DateTime date,
   }) async {
-    final key = _cacheKey(
-      mosque: mosque,
-      hijriYear: hijriYear,
-      hijriMonth: hijriMonth,
-      hijriDay: hijriDay,
-    );
+    _cleanupOldCache();
 
-    // retreive from cache
-    final cached = _cache[key];
-    final cachedAt = _cacheTimestamps[key];
-    if (cached != null &&
-        cachedAt != null &&
-        DateTime.now().difference(cachedAt) < _cacheTtl) {
-      return cached;
+    final key = _cacheKey(mosque: mosque, date: date);
+
+    // 1️⃣ Try Hive cache
+    final cached = _cacheBox.get(key);
+    final cachedAtMillis = _metaBox.get(key);
+
+    if (cached != null && cachedAtMillis != null) {
+      final cachedAt =
+      DateTime.fromMillisecondsSinceEpoch(cachedAtMillis);
+
+      if (DateTime.now().difference(cachedAt) < _cacheTtl) {
+        return List<PrayerTime>.from(cached);
+      }
     }
 
-    final uri = _buildUri(
-      mosque: mosque,
-      hijriYear: hijriYear,
-      hijriMonth: hijriMonth,
-      hijriDay: hijriDay,
-      take: take,
-    );
+    // 2️⃣ Fetch from API
+    final hijri = HijriCalendar.fromDate(date);
 
     final resp = await _withRetry(
-          () => client.get(uri, headers: {'accept': '*/*'}),
+          () => client.get(
+        _buildUri(
+          mosque: mosque,
+          hijriYear: hijri.hYear,
+          hijriMonth: hijri.hMonth,
+          hijriDay: hijri.hDay,
+        ),
+        headers: {'accept': '*/*'},
+      ),
     );
 
     if (resp.statusCode != 200) {
@@ -103,55 +120,28 @@ class PrayerApi {
     }
 
     final body = json.decode(resp.body);
+    final List<dynamic> listJson =
+    body is List ? body : (body['data'] ?? []);
 
-    List<dynamic> listJson;
-    if (body is List) {
-      listJson = body;
-    } else if (body is Map && body['data'] is List) {
-      listJson = body['data'] as List;
-    } else {
-      listJson = const [];
-    }
-
-    final list = listJson
-        .map((e) => PrayerTime.fromJson(Map<String, dynamic>.from(e)))
+    final prayers = listJson
+        .map((e) => PrayerTime.fromJson(
+      Map<String, dynamic>.from(e),
+    ))
         .toList();
 
-    // Save in cache
-    _cache[key] = list;
-    _cacheTimestamps[key] = DateTime.now();
+    // 3️⃣ Save per mosque/day
+    _cacheBox.put(key, prayers);
+    _metaBox.put(key, DateTime.now().millisecondsSinceEpoch);
 
-    return list;
+    return prayers;
   }
 
-  /// fetchPrayers
-  // Future<List<PrayerTime>> getPrayerTimes(String mosque) async {
-  //   final hijri = HijriCalendar.now();
-  //   return fetchPrayers(
-  //     mosque: mosque,
-  //     hijriYear: hijri.hYear,
-  //     hijriMonth: hijri.hMonth,
-  //     hijriDay: hijri.hDay,
-  //     take: 20,
-  //   );
-  // }
-
+  // Public API (unchanged)
   Future<List<PrayerTime>> getPrayerTimes({
     required String mosque,
     required DateTime date,
   }) {
-    final hijri = HijriCalendar.fromDate(date);
-
-    // print('📅 Gregorian: $date');
-    // print('🌙 Hijri: ${hijri.hYear}-${hijri.hMonth}-${hijri.hDay}');
-    // print('🕌 Mosque: $mosque');
-
-    return fetchPrayers(
-      mosque: mosque,
-      hijriYear: hijri.hYear,
-      hijriMonth: hijri.hMonth,
-      hijriDay: hijri.hDay,
-    );
+    return fetchPrayers(mosque: mosque, date: date);
   }
 
   void dispose() => client.close();

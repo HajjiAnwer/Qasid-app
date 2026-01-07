@@ -5,11 +5,17 @@ import 'app_state.dart';
 import 'l10n/app_localizations.dart';
 import 'widgets/app_scaffold.dart';
 import 'features/Loading/loading_screen.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'models/person.dart';
+import 'models/prayer_time.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('apiCache');
+  Hive.registerAdapter(PersonAdapter());
+  Hive.registerAdapter(PrayerTimeAdapter());
+  await Hive.openBox('prayer_cache');
+  await Hive.openBox('prayer_cache_meta');
   final appState = AppState();
   await appState.load();
   runApp(

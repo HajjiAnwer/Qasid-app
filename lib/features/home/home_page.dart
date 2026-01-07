@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:hijri/hijri_calendar.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../l10n/app_localizations.dart';
 import '../../models/prayer_time.dart';
-import '../../services/prayer_api.dart';
 import '../Tools/top-nav-bar.dart';
 import 'home_services_section.dart';
 import 'prayer_timer_display.dart';
@@ -27,19 +27,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final PrayerApi _api = PrayerApi();
-
   List<PrayerTime> _prayers = [];
-  bool _loading = true;
-  String? _error;
-
   late Timer _timer;
   DateTime _now = DateTime.now();
+
+  late Box _prayerBox;
 
   @override
   void initState() {
     super.initState();
-    _loadPrayers();
+    _openHiveBox().then((_) {
+      _loadCachedPrayers();
+    });
 
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
@@ -47,63 +46,29 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  @override
-  void didUpdateWidget(covariant HomePage oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.mosque != widget.mosque) {
-      _loadPrayers();
+  Future<void> _openHiveBox() async {
+    _prayerBox = await Hive.openBox('prayers_${widget.mosque.toLowerCase()}');
+  }
+
+  void _loadCachedPrayers() {
+    final now = DateTime.now();
+
+    // Try today first
+    final todayHijri = HijriCalendar.fromDate(now);
+    final todayKey = '${todayHijri.hYear}-${todayHijri.hMonth}-${todayHijri.hDay}';
+    List<PrayerTime>? list = (_prayerBox.get(todayKey) as List?)?.cast<PrayerTime>();
+
+    // If no upcoming prayers today, try tomorrow
+    if (list == null || !_hasUpcomingPrayer(list)) {
+      final tomorrow = now.add(const Duration(days: 1));
+      final tomorrowHijri = HijriCalendar.fromDate(tomorrow);
+      final tomorrowKey = '${tomorrowHijri.hYear}-${tomorrowHijri.hMonth}-${tomorrowHijri.hDay}';
+      list = (_prayerBox.get(tomorrowKey) as List?)?.cast<PrayerTime>() ?? [];
     }
-  }
 
-  @override
-  void dispose() {
-    _timer.cancel();
-    _api.dispose();
-    super.dispose();
-  }
-
-  // ===============================
-  // تحميل الصلوات (اليوم أو بكرة)
-  // ===============================
-  Future<void> _loadPrayers({bool isTomorrow = false}) async {
     setState(() {
-      _loading = true;
-      _error = null;
+      _prayers = list ?? [];
     });
-
-    try {
-      final now = DateTime.now();
-      final targetDate =
-      isTomorrow ? now.add(const Duration(days: 1)) : now;
-
-      final hijri = HijriCalendar.fromDate(targetDate);
-
-      final list = await _api.fetchPrayers(
-        mosque: widget.mosque,
-        hijriYear: hijri.hYear,
-        hijriMonth: hijri.hMonth,
-        hijriDay: hijri.hDay,
-      );
-
-      if (!mounted) return;
-
-      // إذا ما فيه صلاة قادمة اليوم → نجيب صلوات بكرة
-      if (!isTomorrow && !_hasUpcomingPrayer(list)) {
-        await _loadPrayers(isTomorrow: true);
-        return;
-      }
-
-      setState(() {
-        _prayers = list;
-        _loading = false;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _error = e.toString();
-        _loading = false;
-      });
-    }
   }
 
   bool _hasUpcomingPrayer(List<PrayerTime> list) {
@@ -133,16 +98,14 @@ class _HomePageState extends State<HomePage> {
 
   double _getProgress(PrayerTime? active) {
     if (active == null) return 0.0;
-    
+
     final start = active.localDateTime;
-    // Find previous prayer time to calculate total duration
     int index = _prayers.indexOf(active);
-    DateTime? prevTime;
-    
+    DateTime prevTime;
+
     if (index > 0) {
       prevTime = _prayers[index - 1].localDateTime;
     } else {
-      // If first prayer of day, assume 6 hours ago or use a default interval
       prevTime = start.subtract(const Duration(hours: 4));
     }
 
@@ -150,9 +113,8 @@ class _HomePageState extends State<HomePage> {
     final remainingDuration = start.difference(_now).inSeconds;
 
     if (totalDuration <= 0) return 0.0;
-    
-    double progress = remainingDuration / totalDuration;
-    return progress.clamp(0.0, 1.0);
+
+    return (remainingDuration / totalDuration).clamp(0.0, 1.0);
   }
 
   String _getPrayerName(String prayerKey) {
@@ -176,22 +138,41 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void didUpdateWidget(covariant HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.mosque != widget.mosque) {
+      _openHiveBox().then((_) => _loadCachedPrayers());
+    }
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
     final active = _getActivePrayer();
-    final bool isTomorrowPrayer = active != null &&
-        active.localDateTime.day != _now.day;
     final start = active?.localDateTime;
-
     final diff = start == null
         ? Duration.zero
         : _now.isBefore(start)
         ? start.difference(_now)
         : _now.difference(start);
 
-    final imamName = active?.imam?.displayName(Localizations.localeOf(context).languageCode.startsWith('ar'));
-    final muezzinName = active?.muezzin?.displayName(Localizations.localeOf(context).languageCode.startsWith('ar'));
+    final imamName = active?.imam == null
+        ? null
+        : (Localizations.localeOf(context).languageCode.startsWith('ar')
+        ? '${active!.imam!.lastName} ${active!.imam!.firstName}'
+        : '${active!.imam!.firstName} ${active!.imam!.lastName}');
+
+    final muezzinName = active?.muezzin == null
+        ? null
+        : (Localizations.localeOf(context).languageCode.startsWith('ar')
+        ? '${active!.muezzin!.lastName} ${active!.muezzin!.firstName}'
+        : '${active!.muezzin!.firstName} ${active!.muezzin!.lastName}');
+
     final progress = _getProgress(active);
 
     return Scaffold(
@@ -210,13 +191,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       _buildMosqueSelector(),
                       const SizedBox(height: 24),
-
-                      if (_loading)
-                        const Padding(
-                          padding: EdgeInsets.all(40),
-                          child: CircularProgressIndicator(),
-                        )
-                      else if (active != null)
+                      if (active != null)
                         _buildPrayerSection(
                           prayerName: _getPrayerName(active.prayer),
                           timerText: _format(diff),
@@ -224,9 +199,7 @@ class _HomePageState extends State<HomePage> {
                           muezzin: muezzinName,
                           progress: progress,
                         ),
-
                       const SizedBox(height: 32),
-
                       HomeServicesSection(
                         mosque: widget.mosque,
                         primaryColor: widget.primaryColor,
@@ -248,7 +221,7 @@ class _HomePageState extends State<HomePage> {
   // ===============================
   Widget _buildMosqueSelector() {
     final l10n = context.l10n;
-    final bool isMecca = widget.mosque == 'mecca';
+    final bool isMecca = widget.mosque.toLowerCase() == 'mecca';
 
     return Padding(
       padding: const EdgeInsets.only(top: 0, bottom: 8),
@@ -310,7 +283,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ===============================
-  // Prayer Section (Separated Timer & Details)
+  // Prayer Section
   // ===============================
   Widget _buildPrayerSection({
     required String prayerName,

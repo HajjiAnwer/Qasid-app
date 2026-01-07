@@ -1,13 +1,32 @@
+import 'package:hive/hive.dart';
+import 'person.dart';
+
+part 'prayer_time.g.dart';
+
+@HiveType(typeId: 2)
 class PrayerTime {
+  @HiveField(0)
   final String id;
-  final String prayer; // e.g. "fajr", "dhuhr", "preFajr"
-  final DateTime dateTimeUtc; // original UTC from datetimestampz
+
+  @HiveField(1)
+  final String prayer;
+
+  @HiveField(2)
+  final DateTime dateTimeUtc;
+
+  @HiveField(3)
   final bool isExtra;
+
+  @HiveField(4)
   final bool isNotified;
+
+  @HiveField(5)
   final String mosque;
 
-  // muezzin / imam details (optional)
+  @HiveField(6)
   final Person? muezzin;
+
+  @HiveField(7)
   final Person? imam;
 
   PrayerTime({
@@ -43,87 +62,11 @@ class PrayerTime {
     );
   }
 
-  /// convenience: local time for device
   DateTime get localDateTime => dateTimeUtc.toLocal();
 
-  /// formatted clock "HH:mm"
   String get timeString {
     final lt = localDateTime;
     final two = (int n) => n.toString().padLeft(2, '0');
     return '${two(lt.hour)}:${two(lt.minute)}';
   }
-
-  /// Prayer name localized
-  String prayerName(bool isAr) {
-    const ar = {
-      'fajr': 'الفجر',
-      'preFajr': 'قبل الفجر',
-      'dhuhr': 'الظهر',
-      'asr': 'العصر',
-      'maghrib': 'المغرب',
-      'isha': 'العشاء',
-    };
-
-    const en = {
-      'fajr': 'Fajr',
-      'preFajr': 'Pre-Fajr',
-      'dhuhr': 'Dhuhr',
-      'asr': 'Asr',
-      'maghrib': 'Maghrib',
-      'isha': 'Isha',
-    };
-
-    return isAr
-        ? (ar[prayer] ?? prayer)
-        : (en[prayer] ?? prayer);
-  }
 }
-
-class Person {
-  final String id;
-  final String firstName;
-  final String firstNameEn;
-  final String middleName;
-  final String middleNameEn;
-  final String lastName;
-  final String lastNameEn;
-  final String? imageUrl;
-
-  Person({
-    required this.id,
-    required this.firstName,
-    required this.firstNameEn,
-    required this.middleName,
-    required this.middleNameEn,
-    required this.lastName,
-    required this.lastNameEn,
-    this.imageUrl,
-  });
-
-  factory Person.fromJson(Map<String, dynamic> json) {
-    return Person(
-      id: json['id']?.toString() ?? '',
-      firstName: (json['firstName'] ?? '').toString(),
-      firstNameEn: (json['firstNameEn'] ?? '').toString(),
-      middleName: (json['middleName'] ?? '').toString(),
-      middleNameEn: (json['middleNameEn'] ?? '').toString(),
-      lastName: (json['lastName'] ?? '').toString(),
-      lastNameEn: (json['lastNameEn'] ?? '').toString(),
-      imageUrl: json['image']?.toString(),
-    );
-  }
-
-
-  String displayName(bool isAr) {
-    if (isAr) {
-      return [firstName, middleName, lastName]
-          .where((e) => e.trim().isNotEmpty)
-          .join(' ');
-    } else {
-      return [firstNameEn, middleNameEn, lastNameEn]
-          .where((e) => e.trim().isNotEmpty)
-          .join(' ');
-    }
-  }
-}
-
