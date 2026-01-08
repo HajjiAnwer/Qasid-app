@@ -62,6 +62,17 @@ class PrayerTime {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'prayer': prayer,
+      'datetimestampz': dateTimeUtc.toIso8601String(),
+      'isExtra': isExtra,
+      'muezzin': muezzin,
+      'imam': imam,
+    };
+  }
+
   DateTime get localDateTime => dateTimeUtc.toLocal();
 
   String get timeString {

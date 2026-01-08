@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../controllers/prayer_preload_controller.dart';
-import 'home_page.dart'; // Make sure to import your HomePage
+import '../../widgets/app_scaffold.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -9,44 +9,55 @@ class LoadingScreen extends StatefulWidget {
   State<LoadingScreen> createState() => _LoadingScreenState();
 }
 
-class _LoadingScreenState extends State<LoadingScreen> {
+class _LoadingScreenState extends State<LoadingScreen>
+    with SingleTickerProviderStateMixin {
+  double _progress = 0.0;
+  late AnimationController _controller;
+
   @override
   void initState() {
     super.initState();
-    _preload();
+
+    // Animate progress from 0 to 1 over 3 seconds (adjust as needed)
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..addListener(() {
+      setState(() {
+        _progress = _controller.value;
+      });
+    });
+
+    _controller.forward(); // start the animation
+    _preloadAndNavigate();
   }
 
-  Future<void> _preload() async {
+  Future<void> _preloadAndNavigate() async {
     try {
-      // Preload and update Hive cache for all mosques
+      // Preload Hive data (runs in background)
       await PrayerPreloadController.preload(
-        mosques: const [
-          'Makkah',
-          'Madinah',
-        ],
+        mosques: const ['mecca', 'madinah'],
       );
-      print('Preload finished, Hive cache updated.');
     } catch (e) {
       print('Preload failed: $e');
-      // App continues even if preload fails
     }
+
+    // Wait until progress animation finishes
+    await _controller.forward();
 
     if (!mounted) return;
 
-    // Navigate to HomePage
+    // Navigate to HomePage / AppScaffold
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => HomePage(
-          mosque: 'mecca', // default mosque
-          primaryColor: const Color(0xFF0C6B43),
-          onMosqueChanged: (mosque) {
-            // Handle mosque change if needed
-            print('Mosque changed to $mosque');
-          },
-        ),
-      ),
+      MaterialPageRoute(builder: (_) => const AppScaffold()),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -55,17 +66,15 @@ class _LoadingScreenState extends State<LoadingScreen> {
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background image
+          // Background
           Image.asset(
             'assets/images/background.png',
             fit: BoxFit.cover,
           ),
 
-          // Foreground content
           SafeArea(
             child: Column(
               children: [
-                // Logo
                 Padding(
                   padding: const EdgeInsets.only(top: 90),
                   child: Image.asset(
@@ -75,12 +84,11 @@ class _LoadingScreenState extends State<LoadingScreen> {
                   ),
                 ),
 
-                // Progress bar + loading text
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 20),
                   child: Column(
                     children: [
-                      // Indeterminate progress (during preload)
+                      // Determinate progress bar
                       Container(
                         height: 16,
                         decoration: BoxDecoration(
@@ -89,9 +97,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
-                          child: const LinearProgressIndicator(
-                            backgroundColor: Color(0xFF0C6B43),
-                            valueColor: AlwaysStoppedAnimation<Color>(
+                          child: LinearProgressIndicator(
+                            value: _progress, // progress from 0 to 1
+                            backgroundColor: const Color(0xFF0C6B43),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
                               Colors.white,
                             ),
                           ),
@@ -99,7 +108,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
                       ),
 
                       const SizedBox(height: 10),
-
                       const Text(
                         'Loading',
                         style: TextStyle(

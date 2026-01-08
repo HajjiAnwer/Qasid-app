@@ -1,29 +1,81 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
 import 'app_state.dart';
 import 'l10n/app_localizations.dart';
 import 'widgets/app_scaffold.dart';
 import 'features/Loading/loading_screen.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'models/person.dart';
 import 'models/prayer_time.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  await Hive.initFlutter();
-  Hive.registerAdapter(PersonAdapter());
-  Hive.registerAdapter(PrayerTimeAdapter());
-  await Hive.openBox('prayer_cache');
-  await Hive.openBox('prayer_cache_meta');
-  final appState = AppState();
-  await appState.load();
-  runApp(
-    ChangeNotifierProvider.value(
-      value: appState,
-      child: const QasidApp(),
-    ),
-  );
+  runApp(const AppInitializer());
+}
+
+/// AppInitializer ensures async setup is safe for cold launch
+class AppInitializer extends StatefulWidget {
+  const AppInitializer({super.key});
+
+  @override
+  State<AppInitializer> createState() => _AppInitializerState();
+}
+
+class _AppInitializerState extends State<AppInitializer> {
+  late final Future<AppState> _appStateFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _appStateFuture = _initializeApp();
+  }
+
+  Future<AppState> _initializeApp() async {
+    try {
+      // Hive setup
+      await Hive.initFlutter();
+      Hive.registerAdapter(PersonAdapter());
+      Hive.registerAdapter(PrayerTimeAdapter());
+
+      await Hive.openBox('prayer_cache');
+      await Hive.openBox('prayer_cache_meta');
+
+      // Load AppState
+      final appState = AppState();
+      await appState.load();
+      return appState;
+    } catch (e, st) {
+      print("App initialization failed: $e\n$st");
+      // Return default AppState so app still opens
+      return AppState();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<AppState>(
+      future: _appStateFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          // Temporary loading screen
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        }
+
+        final appState = snapshot.data!;
+
+        return ChangeNotifierProvider.value(
+          value: appState,
+          child: const QasidApp(),
+        );
+      },
+    );
+  }
 }
 
 class QasidApp extends StatelessWidget {
@@ -32,6 +84,7 @@ class QasidApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'بوابة القاصد',
@@ -56,17 +109,17 @@ class QasidApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       builder: (context, child) {
-        final appState = context.watch<AppState>();
         final scale = appState.textScale;
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
+          data: MediaQuery.of(context).copyWith(textScaleFactor: scale),
           child: Directionality(
-            textDirection: appState.locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
+            textDirection:
+            appState.locale.languageCode == 'ar' ? TextDirection.rtl : TextDirection.ltr,
             child: child ?? const SizedBox(),
           ),
         );
       },
-      home: LoadingScreen(),
+      home: const LoadingScreen(),
     );
   }
 }

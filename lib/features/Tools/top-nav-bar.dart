@@ -27,7 +27,7 @@ class TopNavBar extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Icon(Icons.notifications, color: Colors.white, size: 28),
+            const Icon(Icons.menu, color: Colors.white, size: 28),
             Text(
               l10n.electronicServices,
               textAlign: TextAlign.center,
@@ -38,7 +38,7 @@ class TopNavBar extends StatelessWidget {
                 height: 1.2,
               ),
             ),
-            const Icon(Icons.menu, color: Colors.white, size: 28),
+            const Icon(Icons.notifications, color: Colors.white, size: 28),
           ],
         ),
       ),
