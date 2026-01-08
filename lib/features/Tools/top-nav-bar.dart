@@ -28,14 +28,11 @@ class TopNavBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Icon(Icons.menu, color: Colors.white, size: 28),
-            Text(
-              l10n.electronicServices,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
+            SizedBox(
+              height: 60,
+              child: Image.asset(
+                'assets/images/logo.png',
+                fit: BoxFit.contain,
               ),
             ),
             const Icon(Icons.notifications, color: Colors.white, size: 28),

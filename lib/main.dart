@@ -87,7 +87,7 @@ class QasidApp extends StatelessWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'بوابة القاصد',
+      title: 'تطبيق القاصد',
       locale: appState.locale,
       supportedLocales: const [Locale('ar'), Locale('en')],
       localizationsDelegates: const [
