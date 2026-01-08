@@ -142,16 +142,8 @@ class _HomePageState extends State<HomePage> {
         ? start.difference(_now)
         : _now.difference(start);
 
-    final imamName = active?.imam == null
-        ? null
-        : (Localizations.localeOf(context).languageCode.startsWith('ar')
-        ? '${active!.imam!.lastName} ${active!.imam!.firstName}'
-        : '${active!.imam!.firstName} ${active!.imam!.lastName}');
-    final muezzinName = active?.muezzin == null
-        ? null
-        : (Localizations.localeOf(context).languageCode.startsWith('ar')
-        ? '${active!.muezzin!.lastName} ${active!.muezzin!.firstName}'
-        : '${active!.muezzin!.firstName} ${active!.muezzin!.lastName}');
+    final imamName = active?.imam?.displayName(Localizations.localeOf(context).languageCode.startsWith('ar'));
+    final muezzinName = active?.muezzin?.displayName(Localizations.localeOf(context).languageCode.startsWith('ar'));
 
     final progress = _getProgress(active);
 
@@ -321,7 +313,7 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(width: 10),
           Text('$label:', style: TextStyle(color: widget.primaryColor, fontSize: 18, fontWeight: FontWeight.w500, fontFamily: 'DINNextLTArabic',)),
           const SizedBox(width: 6),
-          Expanded(child: Text(value, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'DINNextLTArabic',))),
+          Expanded(child: Text(value, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w700, fontFamily: 'DINNextLTArabic',))),
         ],
       );
 }

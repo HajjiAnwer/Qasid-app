@@ -68,10 +68,13 @@ class PrayerTime {
       'prayer': prayer,
       'datetimestampz': dateTimeUtc.toIso8601String(),
       'isExtra': isExtra,
-      'muezzin': muezzin,
-      'imam': imam,
+      'isNotified': isNotified,
+      'mosque': mosque,
+      'muezzin': muezzin?.toJson(), // serialize nested
+      'imam': imam?.toJson(),       // serialize nested
     };
   }
+
 
   DateTime get localDateTime => dateTimeUtc.toLocal();
 

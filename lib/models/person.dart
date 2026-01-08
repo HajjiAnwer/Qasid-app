@@ -55,4 +55,19 @@ class Person {
       imageUrl: json['image']?.toString(),
     );
   }
+
+  // ✅ Add this method
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'firstName': firstName,
+      'firstNameEn': firstNameEn,
+      'middleName': middleName,
+      'middleNameEn': middleNameEn,
+      'lastName': lastName,
+      'lastNameEn': lastNameEn,
+      'image': imageUrl,
+    };
+  }
+
 }
