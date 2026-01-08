@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../controllers/prayer_preload_controller.dart';
 import '../../widgets/app_scaffold.dart';
+import '../../l10n/app_localizations.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -62,6 +63,7 @@ class _LoadingScreenState extends State<LoadingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
@@ -108,12 +110,14 @@ class _LoadingScreenState extends State<LoadingScreen>
                       ),
 
                       const SizedBox(height: 10),
-                      const Text(
-                        'Loading',
+                      Text(
+                        l10n.loading,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: Color(0xFF0C6B43),
-                          fontSize: 14,
+                          fontFamily: 'DINNextLTArabic',
                           fontWeight: FontWeight.w500,
+                          fontSize: 16,
                         ),
                       ),
                     ],

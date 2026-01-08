@@ -133,6 +133,8 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final active = _getActivePrayer();
+    print("active $active.toJson()");
+    print("active1 $active");
     final start = active?.localDateTime;
     final diff = start == null
         ? Duration.zero
@@ -243,8 +245,9 @@ class _HomePageState extends State<HomePage> {
             child: Text(
               text,
               style: TextStyle(
+                fontFamily: 'DINNextLTArabic',
                 fontSize: 15,
-                fontWeight: FontWeight.w600,
+                fontWeight: FontWeight.w500,
                 color: selected ? Colors.white : Colors.black87,
               ),
             ),
@@ -258,36 +261,54 @@ class _HomePageState extends State<HomePage> {
     String? imam,
     String? muezzin,
     required double progress,
-  }) =>
-      Column(
-        children: [
-          PrayerTimerDisplay(
-            prayerName: prayerName,
-            timerText: timerText,
-            primaryColor: widget.primaryColor,
-            progress: progress,
+  }) {
+    // Ensure non-null strings to avoid errors
+    final imamText = imam ?? '';
+    final muezzinText = muezzin ?? '';
+    print("imam $imam");
+    print("muezzin $muezzin");
+
+    return Column(
+      children: [
+        PrayerTimerDisplay(
+          prayerName: prayerName,
+          timerText: timerText,
+          primaryColor: widget.primaryColor,
+          progress: progress,
+        ),
+        const SizedBox(height: 24),
+
+        // Always display the container
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: widget.primaryColor, width: 2),
           ),
-          const SizedBox(height: 24),
-          if ((imam?.isNotEmpty ?? false) || (muezzin?.isNotEmpty ?? false))
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: widget.primaryColor, width: 2),
+          child: Column(
+            children: [
+              // Show Imam row — empty if no data
+              _buildDetailRow(
+                icon: Icons.person,
+                label: context.l10n.imam,
+                value: imamText.isNotEmpty ? imamText : '-', // show placeholder
               ),
-              child: Column(
-                children: [
-                  if (imam != null && imam.isNotEmpty)
-                    _buildDetailRow(icon: Icons.person, label: context.l10n.imam, value: imam),
-                  if (imam != null && imam.isNotEmpty && muezzin != null && muezzin.isNotEmpty)
-                    const SizedBox(height: 8),
-                  if (muezzin != null && muezzin.isNotEmpty)
-                    _buildDetailRow(icon: Icons.mic, label: context.l10n.muezzin, value: muezzin),
-                ],
+
+              const SizedBox(height: 8),
+
+              // Show Muezzin row — empty if no data
+              _buildDetailRow(
+                icon: Icons.mic,
+                label: context.l10n.muezzin,
+                value: muezzinText.isNotEmpty ? muezzinText : '-', // show placeholder
               ),
-            ),
-        ],
-      );
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
 
   Widget _buildDetailRow({
     required IconData icon,
@@ -298,9 +319,9 @@ class _HomePageState extends State<HomePage> {
         children: [
           Icon(icon, color: widget.primaryColor, size: 20),
           const SizedBox(width: 10),
-          Text('$label:', style: const TextStyle(color: Colors.black54, fontSize: 13, fontWeight: FontWeight.w500)),
+          Text('$label:', style: TextStyle(color: widget.primaryColor, fontSize: 18, fontWeight: FontWeight.w500, fontFamily: 'DINNextLTArabic',)),
           const SizedBox(width: 6),
-          Expanded(child: Text(value, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.bold))),
+          Expanded(child: Text(value, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'DINNextLTArabic',))),
         ],
       );
 }
