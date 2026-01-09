@@ -21,13 +21,6 @@ class SettingsPage extends StatelessWidget {
     final l10n = context.l10n;
 
     return Scaffold(
-        appBar: AppBar(
-          title: Text(l10n.settings),
-          centerTitle: true,
-          backgroundColor: primaryColor,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
