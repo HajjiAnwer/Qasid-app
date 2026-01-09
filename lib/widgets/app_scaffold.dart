@@ -54,7 +54,7 @@ class _AppScaffoldState extends State<AppScaffold> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: primaryColor,
-      drawer: CustomDrawer(),
+      drawer: CustomDrawer(primaryColor: primaryColor),
       appBar: CustomAppBar(
         title: l10n.titleApp,
         leading: IconButton(

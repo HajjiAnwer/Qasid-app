@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomDrawer extends StatelessWidget {
-  const CustomDrawer({Key? key}) : super(key: key);
+  final Color primaryColor;
+  const CustomDrawer({
+    Key? key,
+    required this.primaryColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -9,13 +13,13 @@ class CustomDrawer extends StatelessWidget {
       child: Directionality(
         textDirection: TextDirection.rtl,
         child: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             gradient: LinearGradient(
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                Color(0xFF2F6F64),
-                Color(0xFF4E8B7A),
+                primaryColor.withOpacity(0.8),
+                primaryColor.withOpacity(0.6),
               ],
             ),
           ),
@@ -73,7 +77,7 @@ class CustomDrawer extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.transparent,
-                  border: Border.all(color: Colors.amber, width: 4), // 🔹 outer border (main color)
+                  border: Border.all(color: primaryColor, width: 4), // 🔹 outer border (main color)
                 ),
                 child: Center(
                   child: Container(
@@ -134,14 +138,14 @@ class CustomDrawer extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
       decoration: BoxDecoration(
-        color: filled ? Colors.amber : Colors.transparent,
+        color: filled ? primaryColor : Colors.white,
         borderRadius: BorderRadius.circular(10),
-        border: filled ? null : Border.all(color: Colors.amber),
+        //border: filled ? null : Border.all(color: Colors.amber),
       ),
       child: Text(
         text,
         style: TextStyle(
-          color: filled ? Colors.white : Colors.amber,
+          color: filled ? Colors.white : primaryColor,
           fontSize: 13,
           fontWeight: FontWeight.w500,
           fontFamily: 'DINNextLTArabic',
@@ -182,18 +186,18 @@ class CustomDrawer extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: const Color(0xFFEFF5F3),
+          color: primaryColor.withOpacity(0.15),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: Icon(icon, color: const Color(0xFF2F6F64)),
+        child: Icon(icon, color: primaryColor),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 15,
           fontWeight: FontWeight.w700,
           fontFamily: 'DINNextLTArabic',
-          color: Color(0xFF2F6F64),
+          color: primaryColor,
         ),
       ),
       onTap: () {},
