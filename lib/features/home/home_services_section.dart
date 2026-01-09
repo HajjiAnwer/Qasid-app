@@ -92,7 +92,7 @@ class HomeServicesSection extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (_) => WebPage(
-              title: l10n.tr(item.titleKey),
+              title: getTitle(item.titleKey, l10n),
               url: url,
               primaryColor: primaryColor,
             ),
@@ -119,21 +119,35 @@ class HomeServicesSection extends StatelessWidget {
             Icon(item.icon, color: Colors.white, size: 36),
             const SizedBox(height: 6),
             Text(
-              l10n.tr(item.titleKey),
+              getTitle(item.titleKey, l10n),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
-                fontWeight: FontWeight.bold,
+                fontFamily: 'DINNextLTArabic',
                 fontSize: 13,
-                height: 1.2,
+                fontWeight: FontWeight.w700
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  String getTitle(String key, AppLocalizations l10n) {
+    switch (key) {
+      case 'islamicTerms': return l10n.islamicTerms;
+      case 'haramRecitations': return l10n.haramRecitations;
+      case 'tawafRecitations': return l10n.tawafRecitations;
+      case 'selectedSupplications': return l10n.selectedSupplications;
+      case 'howToPerformWudu': return l10n.howToPerformWudu;
+      case 'howToPray': return l10n.howToPray;
+      case 'holyPlaces': return l10n.holyPlaces;
+      case 'alfatiha': return l10n.alfatiha;
+      default: return '';
+    }
   }
 }
 

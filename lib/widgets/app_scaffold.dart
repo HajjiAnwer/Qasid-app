@@ -42,21 +42,16 @@ class _AppScaffoldState extends State<AppScaffold> {
         },
       ),
 
-      /// الفاتحة
-      FatihaWebPage(
-        primaryColor: primaryColor,
-      ),
-
-      /// مقرأة الحرمين
+      /// الخدمات
       WebPage(
-        title: l10n.maqdaahAlHarameen,
+        title: l10n.services,
         url: 'https://maqraa.prh.gov.sa/${Localizations.localeOf(context).languageCode}',
         primaryColor: primaryColor,
       ),
 
-      /// رسالة الحرمين
+      /// بث مباشر
       WebPage(
-        title: l10n.risalaAlHarameen,
+        title: l10n.liveStream,
         url: 'https://risala.prh.gov.sa/${Localizations.localeOf(context).languageCode}',
         primaryColor: primaryColor,
       ),
@@ -98,46 +93,29 @@ class _AppScaffoldState extends State<AppScaffold> {
               ),
               _buildBottomNavItem(
                 index: 1,
-                icon: Icons.menu_book_outlined,
-                selectedIcon: Icons.menu_book,
-                label: l10n.alfatiha,
+                icon: Icons.library_music_outlined,
+                selectedIcon: Icons.library_music,
+                label: l10n.services,
                 onTap: () async {
-                  if (Platform.isIOS) {
-                    final uri = Uri.parse('https://fatiha.prh.gov.sa/home');
-                    await launchUrl(
-                      uri,
-                      mode: LaunchMode.inAppBrowserView,
-                    );
-                    return;
-                  }
                   setState(() => _selectedIndex = 1);
                 },
               ),
               _buildBottomNavItem(
                 index: 2,
-                icon: Icons.library_music_outlined,
-                selectedIcon: Icons.library_music,
-                label: l10n.recitations,
+                icon: Icons.mail_outline,
+                selectedIcon: Icons.mail,
+                label: l10n.liveStream,
                 onTap: () async {
                   setState(() => _selectedIndex = 2);
                 },
               ),
               _buildBottomNavItem(
                 index: 3,
-                icon: Icons.mail_outline,
-                selectedIcon: Icons.mail,
-                label: l10n.message,
-                onTap: () async {
-                  setState(() => _selectedIndex = 3);
-                },
-              ),
-              _buildBottomNavItem(
-                index: 4,
                 icon: Icons.settings_outlined,
                 selectedIcon: Icons.settings,
                 label: l10n.settings,
                 onTap: () async {
-                  setState(() => _selectedIndex = 4);
+                  setState(() => _selectedIndex = 3);
                 },
               ),
             ],
@@ -156,7 +134,15 @@ class _AppScaffoldState extends State<AppScaffold> {
   }) {
     final isSelected = _selectedIndex == index;
     final brownColor = const Color(0xFF8B6F47);
-    
+
+    // Base text style for bottom nav labels
+    final baseTextStyle = const TextStyle(
+      color: Colors.white,
+      fontSize: 15,
+      fontWeight: FontWeight.w500,
+      fontFamily: 'DINNextLTArabic',
+    );
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -164,8 +150,8 @@ class _AppScaffoldState extends State<AppScaffold> {
           decoration: BoxDecoration(
             border: isSelected
                 ? Border(
-                    top: BorderSide(color: brownColor, width: 4),
-                  )
+              top: BorderSide(color: brownColor, width: 4),
+            )
                 : null,
           ),
           padding: const EdgeInsets.symmetric(vertical: 8),
@@ -180,10 +166,8 @@ class _AppScaffoldState extends State<AppScaffold> {
               const SizedBox(height: 4),
               Text(
                 label,
-                style: TextStyle(
+                style: baseTextStyle.copyWith(
                   color: isSelected ? brownColor : Colors.white,
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
             ],

@@ -14,7 +14,7 @@ class TopNavBar extends StatelessWidget {
     final l10n = context.l10n;
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       decoration: BoxDecoration(
         color: primaryColor,
         borderRadius: const BorderRadius.only(
@@ -29,10 +29,11 @@ class TopNavBar extends StatelessWidget {
           children: [
             const Icon(Icons.menu, color: Colors.white, size: 28),
             SizedBox(
-              height: 60,
-              child: Image.asset(
-                'assets/images/logo.png',
-                fit: BoxFit.contain,
+              height: 40,
+              child: Text(
+                l10n.titleApp,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w700, fontFamily: 'DINNextLTArabic'),
               ),
             ),
             const Icon(Icons.notifications, color: Colors.white, size: 28),
