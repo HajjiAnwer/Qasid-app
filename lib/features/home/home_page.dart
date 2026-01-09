@@ -296,12 +296,12 @@ class _HomePageState extends State<HomePage> {
       Row(
         children: [
           Icon(icon, color: widget.primaryColor, size: 20),
-          const SizedBox(width: 10),
+          const SizedBox(width: 6),
           Text(
             '$label:',
             style: TextStyle(
               color: widget.primaryColor,
-              fontSize: 18,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
               fontFamily: 'DINNextLTArabic',
             ),
@@ -312,7 +312,7 @@ class _HomePageState extends State<HomePage> {
               value,
               style: const TextStyle(
                 color: Colors.black87,
-                fontSize: 18,
+                fontSize: 15,
                 fontWeight: FontWeight.w700,
                 fontFamily: 'DINNextLTArabic',
               ),

@@ -25,15 +25,15 @@ class PrayerTimerDisplay extends StatelessWidget {
     final Color activeColor = strokeColor ?? primaryColor;
     
     return SizedBox(
-      width: 220,
-      height: 220,
+      width: 180,
+      height: 180,
       child: Stack(
         alignment: Alignment.center,
         children: [
           // Background Circle
           SizedBox(
-            width: 220,
-            height: 220,
+            width: 180,
+            height: 180,
             child: CircularProgressIndicator(
               value: 1.0,
               strokeWidth: lineWidth,
@@ -42,8 +42,8 @@ class PrayerTimerDisplay extends StatelessWidget {
           ),
           // Progress Arc
           SizedBox(
-            width: 220,
-            height: 220,
+            width: 180,
+            height: 180,
             child: CircularProgressIndicator(
               value: progress.clamp(0.0, 1.0),
               strokeWidth: lineWidth,
@@ -60,27 +60,27 @@ class PrayerTimerDisplay extends StatelessWidget {
                 style: const TextStyle(
                   color: Colors.black,
                     fontFamily: 'DINNextLTArabic',
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w700,
                     fontSize: 18,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 2),
               Text(
                 prayerName,
                 style: TextStyle(
                   color: primaryColor,
                   fontFamily: 'DINNextLTArabic',
                   fontWeight: FontWeight.w700,
-                  fontSize: 32,
+                  fontSize: 28,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 2),
               Text(
                 timerText,
                 style: const TextStyle(
                   color: Colors.green,
                   fontFamily: 'DINNextLTArabic',
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w700,
                   fontSize: 32,
                 ),
               ),

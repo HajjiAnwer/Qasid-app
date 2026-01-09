@@ -140,16 +140,16 @@ class _AppScaffoldState extends State<AppScaffold> {
                 ? Border(top: BorderSide(color: brownColor, width: 4))
                 : null,
           ),
-          padding: const EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 4),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 isSelected ? selectedIcon : icon,
                 color: isSelected ? brownColor : Colors.white,
-                size: 24,
+                size: 26,
               ),
-              const SizedBox(height: 4),
+              //const SizedBox(height: 2),
               Text(
                 label,
                 style: baseTextStyle.copyWith(
