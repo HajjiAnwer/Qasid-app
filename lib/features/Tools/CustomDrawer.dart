@@ -68,9 +68,11 @@ class CustomDrawer extends StatelessWidget {
     bool isRtl = Directionality.of(context) == TextDirection.rtl;
 
     return Container(
-      height: 100,
+      constraints: const BoxConstraints(
+        minHeight: 100, // minimum only
+      ),
       margin: const EdgeInsets.symmetric(horizontal: 10),
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.15),
         borderRadius: BorderRadius.circular(20),
@@ -178,17 +180,26 @@ class CustomDrawer extends StatelessWidget {
   }
 
   Widget _actionButton({required String text, required bool filled}) {
-    return Container(
-      width: 90, // fixed width for all buttons
-      height: 35, // fixed height for all buttons
-      decoration: BoxDecoration(
-        color: filled ? primaryColor : Colors.white,
-        borderRadius: BorderRadius.circular(10),
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        minWidth: 90,
+        maxWidth: 90,
+        minHeight: 35, // minimum height only
       ),
-      child: Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 6,
+          vertical: 6,
+        ),
+        decoration: BoxDecoration(
+          color: filled ? primaryColor : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        alignment: Alignment.center,
         child: Text(
           text,
           textAlign: TextAlign.center,
+          maxLines: 2, // allows vertical growth
           style: TextStyle(
             color: filled ? Colors.white : primaryColor,
             fontSize: 13,
@@ -199,6 +210,8 @@ class CustomDrawer extends StatelessWidget {
       ),
     );
   }
+
+
 
 
   // ================= MENU =================
