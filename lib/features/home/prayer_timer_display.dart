@@ -23,71 +23,87 @@ class PrayerTimerDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     final Color activeColor = strokeColor ?? primaryColor;
-    
-    return SizedBox(
-      width: 180,
-      height: 180,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background Circle
-          SizedBox(
-            width: 180,
-            height: 180,
-            child: CircularProgressIndicator(
-              value: 1.0,
-              strokeWidth: lineWidth,
-              color: activeColor.withOpacity(0.1),
-            ),
-          ),
-          // Progress Arc
-          SizedBox(
-            width: 180,
-            height: 180,
-            child: CircularProgressIndicator(
-              value: progress.clamp(0.0, 1.0),
-              strokeWidth: lineWidth,
-              color: activeColor,
-              strokeCap: StrokeCap.round,
-            ),
-          ),
-          // Content
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // 👇 dynamic size based on screen
+        final double size = (constraints.maxWidth * 0.6)
+            .clamp(160.0, 260.0); // min & max
+
+        return SizedBox(
+          width: size,
+          height: size,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              Text(
-                l10n.nextPrayer,
-                style: const TextStyle(
-                  color: Colors.black,
-                    fontFamily: 'DINNextLTArabic',
-                    fontWeight: FontWeight.w700,
-                    fontSize: 18,
+              // Background circle
+              SizedBox(
+                width: size,
+                height: size,
+                child: CircularProgressIndicator(
+                  value: 1.0,
+                  strokeWidth: lineWidth,
+                  color: activeColor.withOpacity(0.1),
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                prayerName,
-                style: TextStyle(
-                  color: primaryColor,
-                  fontFamily: 'DINNextLTArabic',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 28,
+
+              // Progress arc
+              SizedBox(
+                width: size,
+                height: size,
+                child: CircularProgressIndicator(
+                  value: progress.clamp(0.0, 1.0),
+                  strokeWidth: lineWidth,
+                  color: activeColor,
+                  strokeCap: StrokeCap.round,
                 ),
               ),
-              const SizedBox(height: 2),
-              Text(
-                timerText,
-                style: const TextStyle(
-                  color: Colors.green,
-                  fontFamily: 'DINNextLTArabic',
-                  fontWeight: FontWeight.w700,
-                  fontSize: 32,
+
+              // Content
+              Padding(
+                padding: EdgeInsets.all(size * 0.12),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        l10n.nextPrayer,
+                        style: TextStyle(
+                          fontSize: size * 0.10,
+                          fontFamily: 'DINNextLTArabic',
+                          fontWeight: FontWeight.w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                      SizedBox(height: size * 0.02),
+                      Text(
+                        prayerName,
+                        style: TextStyle(
+                          fontSize: size * 0.16,
+                          fontFamily: 'DINNextLTArabic',
+                          fontWeight: FontWeight.w700,
+                          color: primaryColor,
+                        ),
+                      ),
+                      SizedBox(height: size * 0.02),
+                      Text(
+                        timerText,
+                        style: TextStyle(
+                          fontSize: size * 0.18,
+                          fontFamily: 'DINNextLTArabic',
+                          fontWeight: FontWeight.w700,
+                          color: Colors.green,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }
