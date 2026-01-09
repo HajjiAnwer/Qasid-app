@@ -179,22 +179,27 @@ class CustomDrawer extends StatelessWidget {
 
   Widget _actionButton({required String text, required bool filled}) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+      width: 90, // fixed width for all buttons
+      height: 35, // fixed height for all buttons
       decoration: BoxDecoration(
         color: filled ? primaryColor : Colors.white,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: filled ? Colors.white : primaryColor,
-          fontSize: 13,
-          fontWeight: FontWeight.w500,
-          fontFamily: 'DINNextLTArabic',
+      child: Center(
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: filled ? Colors.white : primaryColor,
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'DINNextLTArabic',
+          ),
         ),
       ),
     );
   }
+
 
   // ================= MENU =================
   Widget _buildMenu(BuildContext context) {
