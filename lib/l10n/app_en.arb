@@ -47,5 +47,8 @@
   "english": "English",
   "titleApp": "Qasid application",
   "services": "Services",
-  "liveStream": "Live Stream"
+  "liveStream": "Live",
+  "shareApp": "Share the App",
+  "shareAppDescription": "Tell your friends about this app",
+  "fontScale": "Font Size"
 }

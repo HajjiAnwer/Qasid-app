@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:share_plus/share_plus.dart';
 import '../../app_state.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -31,20 +31,34 @@ class SettingsPage extends StatelessWidget {
             child: Column(
               children: [
                 RadioListTile<bool>(
-                  title: Text(l10n.arabic),
+                  title: Text(
+                    l10n.arabic,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'DINNextLTArabic',
+                    ),
+                  ),
                   value: true,
                   groupValue: Localizations.localeOf(context).languageCode.startsWith('ar'),
                     onChanged: (v) =>
                         context.read<AppState>().setLocale(const Locale('ar')),
-
+                  activeColor: primaryColor,
                 ),
                 RadioListTile<bool>(
-                  title: Text(l10n.english),
+                  title: Text(
+                    l10n.english,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'DINNextLTArabic',
+                    ),
+                  ),
                   value: false,
                   groupValue: Localizations.localeOf(context).languageCode.startsWith('ar'),
                     onChanged: (v) =>
                         context.read<AppState>().setLocale(const Locale('en')),
-
+                  activeColor: primaryColor,
                 ),
               ],
             ),
@@ -129,16 +143,76 @@ class SettingsPage extends StatelessWidget {
               children: [
                 Text(
                   l10n.appName,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'DINNextLTArabic',
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   l10n.version,
-                  style: const TextStyle(color: Colors.grey),
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    fontFamily: 'DINNextLTArabic',
+                  ),
                 ),
               ],
             ),
           ),
+
+          const SizedBox(height: 16),
+
+          /// ================= Share the App =================
+          _SettingCard(
+            title: l10n.shareApp,
+            icon: Icons.share,
+            child: _SettingRow(
+              title: l10n.shareAppDescription,// e.g., "Share this app with your friends"
+              showArrow: true,
+              onTap: () {
+                Share.share(
+                  'Check out this amazing app: https://example.com', // replace with your app link
+                );
+              },
+            ),
+          ),
+
+          const SizedBox(height: 16),
+
+          /// ================= Font Scale =================
+          _SettingCard(
+            title: l10n.fontScale,
+            icon: Icons.text_fields,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Slider(
+                  value: context.watch<AppState>().fontScale,
+                  min: 0.8,
+                  max: 1.5,
+                  divisions: 7, // steps: 0.8, 0.9, 1.0 ... 1.5
+                  label: '${(context.watch<AppState>().fontScale * 100).round()}%',
+                  activeColor: primaryColor, // ✅ primary color tint
+                  onChanged: (value) {
+                    context.read<AppState>().setFontScale(value);
+                  },
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Text(
+                    '${(context.watch<AppState>().fontScale * 100).round()}%',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
         ],
       ),
     );
@@ -185,13 +259,14 @@ class _SettingCard extends StatelessWidget {
               Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'DINNextLTArabic',
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           child,
         ],
       ),
@@ -226,8 +301,9 @@ class _SettingRow extends StatelessWidget {
               children: [
                 Text(title,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 16,
                       fontWeight: FontWeight.w500,
+                      fontFamily: 'DINNextLTArabic',
                     )),
                 if (value != null)
                   Padding(
@@ -236,6 +312,8 @@ class _SettingRow extends StatelessWidget {
                       value!,
                       style: const TextStyle(
                         fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'DINNextLTArabic',
                         color: Colors.grey,
                       ),
                     ),
@@ -296,8 +374,9 @@ class _MosqueButton extends StatelessWidget {
             textAlign: TextAlign.center,
             style: TextStyle(
               color: selected ? Colors.white : Colors.black87,
-              fontWeight: FontWeight.bold,
               fontSize: 15,
+              fontWeight: FontWeight.w700,
+              fontFamily: 'DINNextLTArabic',
             ),
           ),
         ),

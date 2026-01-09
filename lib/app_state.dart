@@ -8,6 +8,14 @@ class AppState extends ChangeNotifier {
   Locale get locale => _locale;
   double get textScale => _textScale;
 
+  double _fontScale = 1.0; // default normal
+  double get fontScale => _fontScale;
+
+  void setFontScale(double scale) {
+    _fontScale = scale;
+    notifyListeners();
+  }
+
   Future<void> load() async {
     final prefs = await SharedPreferences.getInstance();
     final lang = prefs.getString('lang') ?? 'ar';

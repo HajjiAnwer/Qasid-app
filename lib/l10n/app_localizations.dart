@@ -66,6 +66,7 @@ extension AppLocalizationsX on BuildContext {
   AppLocalizations get l10n => AppLocalizations.of(this) ?? AppLocalizations.defaultLocalization;
 }
 
+
 abstract class AppLocalizations {
   AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
@@ -77,7 +78,6 @@ abstract class AppLocalizations {
 
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
   static final AppLocalizations defaultLocalization = AppLocalizationsAr();
-
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
   ///
@@ -394,6 +394,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Live Stream'**
   String get liveStream;
+
+  /// No description provided for @shareApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share the App'**
+  String get shareApp;
+
+  /// No description provided for @shareAppDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell your friends about this app'**
+  String get shareAppDescription;
+
+  /// No description provided for @fontScale.
+  ///
+  /// In en, this message translates to:
+  /// **'Font Size'**
+  String get fontScale;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

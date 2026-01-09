@@ -47,5 +47,8 @@
   "english": "English",
   "titleApp": "تطبيق القاصد",
   "services": "الخدمات",
-  "liveStream": "بث مباشر"
+  "liveStream": "بث مباشر",
+  "shareApp": "مشاركة التطبيق",
+  "shareAppDescription": "أخبر أصدقائك عن هذا التطبيق",
+  "fontScale": "حجم الخط"
 }

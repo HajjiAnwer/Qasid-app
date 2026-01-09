@@ -109,7 +109,7 @@ class QasidApp extends StatelessWidget {
         brightness: Brightness.light,
       ),
       builder: (context, child) {
-        final scale = appState.textScale;
+        final scale = appState.fontScale;
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(textScaleFactor: scale),
           child: Directionality(

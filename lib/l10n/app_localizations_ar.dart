@@ -154,4 +154,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get liveStream => 'بث مباشر';
+
+  @override
+  String get shareApp => 'مشاركة التطبيق';
+
+  @override
+  String get shareAppDescription => 'أخبر أصدقائك عن هذا التطبيق';
+
+  @override
+  String get fontScale => 'حجم الخط';
 }

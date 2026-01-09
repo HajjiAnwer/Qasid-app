@@ -154,4 +154,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get liveStream => 'Live Stream';
+
+  @override
+  String get shareApp => 'Share the App';
+
+  @override
+  String get shareAppDescription => 'Tell your friends about this app';
+
+  @override
+  String get fontScale => 'Font Size';
 }
