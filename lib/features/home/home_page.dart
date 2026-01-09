@@ -49,7 +49,6 @@ class _HomePageState extends State<HomePage> {
         date: today,
       );
 
-      // Use tomorrow if no upcoming prayers today
       if (!_hasUpcomingPrayer(prayers)) {
         final tomorrow = today.add(const Duration(days: 1));
         prayers = await _api.getPrayerTimes(
@@ -133,8 +132,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final active = _getActivePrayer();
-    print("active $active.toJson()");
-    print("active1 $active");
     final start = active?.localDateTime;
     final diff = start == null
         ? Duration.zero
@@ -147,11 +144,10 @@ class _HomePageState extends State<HomePage> {
 
     final progress = _getProgress(active);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Column(
+    return Container(
+      color: Colors.white, // set the background to white
+      child: Column(
         children: [
-          TopNavBar(primaryColor: widget.primaryColor),
           Expanded(
             child: SafeArea(
               top: false,
@@ -254,11 +250,8 @@ class _HomePageState extends State<HomePage> {
     String? muezzin,
     required double progress,
   }) {
-    // Ensure non-null strings to avoid errors
     final imamText = imam ?? '';
     final muezzinText = muezzin ?? '';
-    print("imam $imam");
-    print("muezzin $muezzin");
 
     return Column(
       children: [
@@ -269,8 +262,6 @@ class _HomePageState extends State<HomePage> {
           progress: progress,
         ),
         const SizedBox(height: 24),
-
-        // Always display the container
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
@@ -279,20 +270,16 @@ class _HomePageState extends State<HomePage> {
           ),
           child: Column(
             children: [
-              // Show Imam row — empty if no data
               _buildDetailRow(
                 icon: Icons.person,
                 label: context.l10n.imam,
-                value: imamText.isNotEmpty ? imamText : '-', // show placeholder
+                value: imamText.isNotEmpty ? imamText : '-',
               ),
-
               const SizedBox(height: 8),
-
-              // Show Muezzin row — empty if no data
               _buildDetailRow(
                 icon: Icons.mic,
                 label: context.l10n.muezzin,
-                value: muezzinText.isNotEmpty ? muezzinText : '-', // show placeholder
+                value: muezzinText.isNotEmpty ? muezzinText : '-',
               ),
             ],
           ),
@@ -300,7 +287,6 @@ class _HomePageState extends State<HomePage> {
       ],
     );
   }
-
 
   Widget _buildDetailRow({
     required IconData icon,
@@ -311,9 +297,27 @@ class _HomePageState extends State<HomePage> {
         children: [
           Icon(icon, color: widget.primaryColor, size: 20),
           const SizedBox(width: 10),
-          Text('$label:', style: TextStyle(color: widget.primaryColor, fontSize: 18, fontWeight: FontWeight.w500, fontFamily: 'DINNextLTArabic',)),
+          Text(
+            '$label:',
+            style: TextStyle(
+              color: widget.primaryColor,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'DINNextLTArabic',
+            ),
+          ),
           const SizedBox(width: 6),
-          Expanded(child: Text(value, style: const TextStyle(color: Colors.black87, fontSize: 18, fontWeight: FontWeight.w700, fontFamily: 'DINNextLTArabic',))),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                color: Colors.black87,
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'DINNextLTArabic',
+              ),
+            ),
+          ),
         ],
       );
 }
